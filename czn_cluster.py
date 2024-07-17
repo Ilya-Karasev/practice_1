@@ -1,0 +1,83 @@
+import pandas as pd
+
+# Функция для определения отрасли по профессии
+def determine_industry(profession):
+    profession = profession.lower()
+    if any(keyword in profession for keyword in ['врач', 'госпитал', 'акушер', 'бактери', 'псих', 'экол', 'вет', 'санитар', 'гигиен', 'сестра', 'фельдшер', 'дезинфек', 'зубн']):
+        return 'Здравоохранение'
+    elif any(keyword in profession for keyword in ['учитель', 'профессор', 'академ', 'методист', 'вожат', 'воспит', 'дефектолог', 'доцент']):
+        return 'Образование'
+    elif any(keyword in profession for keyword in ['а/слесарь', 'автомехан', 'автослесарь', 'автоэлектр', 'авиационный', 'аэродром', 'води', 'вызыв', 'детейл', 'веб']):
+        return 'Транспорт'
+    elif any(keyword in profession for keyword in ['программист', 'системный администратор', 'веб']):
+        return 'IT и связь'
+    elif any(keyword in profession for keyword in ['аврхив', 'архив', 'аудит', 'библиограф', 'адвокат', 'аналитик', 'библиоте', 'документ', 'юрис', 'делопроизвод']):
+        return 'Информационные и деловые услуги'
+    elif any(keyword in profession for keyword in ['агент', 'бизнес', 'менеджер', 'маркет', 'бухгалтер', 'эконом', 'консультант', 'товар', 'декларант', 'демонстр']):
+        return 'Экономика и торговля'
+    elif any(keyword in profession for keyword in ['агро', 'скот', 'охот', 'вес', 'зоотехник', 'глава кфх', 'глава кх', 'лесничий', 'мелиоратор', 'рыбовод', 'гранул', 'дезодаратор', 'дояр', 'животновод', 'земледел', 'зерносуш', 'зоотехник']):
+        return 'Сельское хозяйство'
+    elif any(keyword in profession for keyword in ['администр', 'бригадир', 'ассист', 'инспект', 'директ', 'секрет', 'глава', 'ревизор', 'представитель', 'совет', 'дежур', 'диспетч', 'зав', 'зам', 'звед']):
+        return 'Администрирование и управление'
+    elif any(keyword in profession for keyword in ['аккомп', 'артист', 'архео', 'балет', 'бутафор', 'оператор', 'программы', 'худож', 'дирижер', 'редакт', 'режисс', 'хормейстер', 'дизайнер', 'грим', 'декор', 'дизайн']):
+        return 'Искусство и культура'
+    elif any(keyword in profession for keyword in ['арматур', 'архитект', 'бетонщик', 'асфальт', 'автокран', 'строит', 'грунт', 'дорожный']):
+        return 'Строительство'
+    elif any(keyword in profession for keyword in ['агломер', 'барильет', 'бункер', 'автоклав', 'автоматчик', 'аккум', 'аппарат', 'брошюр', 'аэрограф', 'вальц', 'варщ', 'инженер', 'механ', 'техн', 'энерг', 'волоч', 'вулкан', 'выбив', 'вышив', 'газ', 'гальван', 'гибщ', 'диспетчер', 'конструкт', 'металлург', 'сварщ', 'плавил', 'теплотехник', 'технолог', 'горнов', 'грохот', 'гумм', 'дверев', 'дефектоскоп', 'доводчик', 'долбеж', 'жестянщ', 'заварщ', 'загруз', 'заквас', 'закройщ', 'заливщ', 'засольщ', 'засыпщ', 'заточ', 'зашивальщ', 'зуборезч']):
+        return 'Обрабатывающая промышленность'
+    elif any(keyword in profession for keyword in ['кассир', 'бармен', 'вах', 'дискотек', 'водопров', 'водоразд', 'газов', 'гардероб', 'гладильщик', 'горничн', 'гравер', 'груз', 'двор', 'сторож', 'домработ']):
+        return 'Бытовое обслуживание и услуги'
+    elif any(keyword in profession for keyword in ['биолог', 'хим', 'лаборант', 'зоолог']):
+        return 'Научная деятельность'
+    elif any(keyword in profession for keyword in ['буфет', 'глазировщик']):
+        return 'Общественное питание'
+    elif any(keyword in profession for keyword in ['бурил', 'вальщ', 'взрыв', 'гасил', 'гео', 'гидротехник', 'гидроциклонщик', 'маркшейдер', 'горнорабочий', 'горный мастер', 'дози', 'дробил', 'замерщ']):
+        return 'Добывающая промышленность'
+    else:
+        return 'Другое'
+
+# Загрузка данных из файлов
+dolzhnosti_file_path = 'ЦЗН_сгруппированные_должности.xlsx'
+specialnosti_file_path = 'ЦЗН_сгруппированные_специальности.xlsx'
+
+dolzhnosti_df = pd.read_excel(dolzhnosti_file_path, engine='openpyxl')
+specialnosti_df = pd.read_excel(specialnosti_file_path, engine='openpyxl')
+
+# Применение функции определения отрасли к столбцам "Базовая должность" и "Базовая специальность"
+dolzhnosti_df['Отрасль'] = dolzhnosti_df['Базовая должность'].apply(determine_industry)
+specialnosti_df['Отрасль'] = specialnosti_df['Базовая специальность'].apply(determine_industry)
+
+# Группировка данных по отраслям для базовых должностей
+grouped_dolzhnosti_df = dolzhnosti_df.groupby('Отрасль').agg({
+    'Базовая должность': lambda x: list(x),
+    'Пол': lambda x: list(x),
+    'Возраст на момент обращения': 'mean',
+    'Основание незанятости': lambda x: list(x),
+    'Основание увольнения': lambda x: list(x),
+    'Средний заработок': 'mean',
+    'Год увольнения': lambda x: list(x),
+    'Стаж на последней работе': 'mean',
+    'Образование': lambda x: list(x)
+}).reset_index()
+
+# Группировка данных по отраслям для базовых специальностей
+grouped_specialnosti_df = specialnosti_df.groupby('Отрасль').agg({
+    'Базовая специальность': lambda x: list(x),
+    'Пол': lambda x: list(x),
+    'Возраст на момент обращения': 'mean',
+    'Основание незанятости': lambda x: list(x),
+    'Основание увольнения': lambda x: list(x),
+    'Средний заработок': 'mean',
+    'Год увольнения': lambda x: list(x),
+    'Стаж на последней работе': 'mean',
+    'Образование': lambda x: list(x)
+}).reset_index()
+
+# Сохранение результата в новые файлы
+output_file_path_grouped_dolzhnosti = 'ЦЗН_должности_отрасли.xlsx'
+output_file_path_grouped_specialnosti = 'ЦЗН_специальности_отрасли.xlsx'
+
+grouped_dolzhnosti_df.to_excel(output_file_path_grouped_dolzhnosti, index=False)
+grouped_specialnosti_df.to_excel(output_file_path_grouped_specialnosti, index=False)
+
+print(f"Сгруппированные данные по отраслям сохранены в файлы: {output_file_path_grouped_dolzhnosti} и {output_file_path_grouped_specialnosti}")
